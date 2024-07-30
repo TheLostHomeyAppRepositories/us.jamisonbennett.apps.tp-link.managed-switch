@@ -1,0 +1,28 @@
+<h1 class="homey-title" data-i18n="settings.drivers.tp-link-managed-switch.pair.connection_input.title"></h1>
+
+<form id="connection-form" class="form-container">
+
+<div class="homey-form-group">
+  <label class="homey-form-label" for="addresss" data-i18n="settings.drivers.tp-link-managed-switch.pair.connection_input.addressLabel"></label>
+  <input class="homey-form-input" id="address" type="text" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.pair.connection_input.addressPlaceholder" />
+
+  <label class="homey-form-label" for="username" data-i18n="settings.drivers.tp-link-managed-switch.pair.connection_input.usernameLabel"></label>
+  <input class="homey-form-input" id="username" type="text" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.pair.connection_input.usernamePlaceholder" />
+
+  <label class="homey-form-label" for="password" data-i18n="settings.drivers.tp-link-managed-switch.pair.connection_input.passwordLabel"></label>
+  <input class="homey-form-input" id="password" type="password" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.pair.connection_input.passwordPlaceholder" />
+</div>
+
+<button class="homey-button-primary-full" id="next" data-i18n="settings.drivers.tp-link-managed-switch.pair.connection_input.connect" type="button"></button>
+
+</form>
+
+<script type="application/javascript">
+  document.getElementById('next').addEventListener('click', function (e) {
+    const address = document.getElementById('address').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    Homey.emit("set_connection_info", { address, username, password });
+  });
+</script>
+

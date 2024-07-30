@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "drivers": {
+      "tp-link-managed-switch": {
+        "pair": {
+          "connection_input": {
+            "title": "Connect to your managed switch",
+            "addressLabel": "IP address or address",
+            "addressPlaceholder": "192.168.0.1 or managed-switch.local",
+            "usernameLabel": "Username",
+            "usernamePlaceholder": "admin",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "password",
+            "connect": "Connect"
+          },
+          "connection_error": {
+            "title": "Connection error",
+            "errorText": "Unabled to connect to the managed switch",
+            "close": "Close"
+          }
+        }
+      }
+    }
+  }
+}

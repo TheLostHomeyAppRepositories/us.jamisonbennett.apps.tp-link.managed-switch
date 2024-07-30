@@ -1,0 +1,28 @@
+{
+  "id": "us.jamisonbennett.apps.homey.tp-link.managed-switch",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "TP-Link Managed Switch"
+  },
+  "description": {
+    "en": "Switch management that supports TP-Link managed switches"
+  },
+  "category": [
+    "internet"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Jamison Bennett",
+    "email": ""
+  }
+}
