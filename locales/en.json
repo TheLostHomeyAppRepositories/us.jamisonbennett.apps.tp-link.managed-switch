@@ -2,6 +2,7 @@
   "settings": {
     "drivers": {
       "tp-link-managed-switch": {
+        "portName": "Port __number__",
         "pair": {
           "connection_input": {
             "title": "Connect to your managed switch",
