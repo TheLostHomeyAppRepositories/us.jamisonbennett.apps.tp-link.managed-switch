@@ -1,0 +1,15 @@
+[
+  {
+    "id": "default_port_number",
+    "type": "number",
+    "label": {
+      "en": "Default port"
+    },
+    "value": 0,
+    "min": 0,
+    "max": 128,
+    "hint": {
+      "en": "Port 0 will disable the default port. The port must exist on the device."
+    }
+  }
+]
