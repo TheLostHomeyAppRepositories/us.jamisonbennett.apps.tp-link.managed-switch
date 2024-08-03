@@ -4,6 +4,8 @@ import DeviceAPI from './deviceAPI';
 class Device extends Homey.Device {
 
   private deviceAPI: DeviceAPI | null = null
+  private refreshInterval: NodeJS.Timeout | null = null
+  private refeshTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
 
   private configurablePorts: boolean[] | null = null
 
@@ -43,6 +45,19 @@ class Device extends Homey.Device {
 
     // Set the current values of each switch
     this.refreshState();
+
+    this.refreshInterval = setInterval(() => {
+      this.refreshState().catch(error => {
+        this.log('Error refreshing state: ', error);
+      });
+    }, this.refeshTimeIterval);
+  }
+
+  async onUninit() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
+    }
   }
 
   async refreshState() {
