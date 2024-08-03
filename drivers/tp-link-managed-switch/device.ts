@@ -40,6 +40,29 @@ class Device extends Homey.Device {
     }
 
     await this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
+
+    // Set the current values of each switch
+    this.refreshState();
+  }
+
+  async refreshState() {
+    if (this.deviceAPI == null) {
+      return;
+    }
+
+    // Set the current values of each switch
+    const portStatus = await this.deviceAPI.getAllPortsEnabled();
+    if (portStatus) {
+      const defaultPortNumber = this.getSetting('default_port_number') || 0;
+      if (defaultPortNumber == 0) {
+        await this.setCapabilityValue(`onoff.default`, true);
+      } else if (defaultPortNumber > 0 && defaultPortNumber <= portStatus.length) {
+        await this.setCapabilityValue(`onoff.default`, portStatus[defaultPortNumber-1]);
+      }
+      for (let i = 0; i < portStatus.length; i++) {
+        await this.setCapabilityValue(`onoff.${i+1}`, portStatus[i]);
+      }
+    }
   }
 
   async onCapabilityOnoff(port: number, value: boolean) {
@@ -58,6 +81,7 @@ class Device extends Homey.Device {
       this.log(`Unable to set the port ${port} ${value ? 'on' : 'off'} because it was configuration is restricted.`);
       throw new Error(`Unable to set the port ${port} ${value ? 'on' : 'off'} because it was configuration is restricted.`);
     }
+    return this.refreshState();
   }
 
   async onCapabilityOnoffDefault(value: boolean) {
@@ -65,7 +89,7 @@ class Device extends Homey.Device {
     this.log(`Turning the default switch port ${defaultPortNumber} ${value ? 'on' : 'off'}`);
     if (defaultPortNumber == 0) {
       // There is no default port
-      return;
+      return this.refreshState();
     }
 
     return this.onCapabilityOnoff(defaultPortNumber, value);
@@ -97,6 +121,9 @@ class Device extends Homey.Device {
           throw new Error(`The maximum port number on this device is ${this.deviceAPI.getNumPorts()}.`);
         }
       }
+
+      // Refresh the default swich state
+      this.refreshState().then(() => undefined);
     } catch (error) {
       if (error instanceof Error) {
         this.log("Invalid default port number:", error.message);

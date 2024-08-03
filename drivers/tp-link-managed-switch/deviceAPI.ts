@@ -249,6 +249,20 @@ class DeviceAPI {
     return this.numPorts;
   }
 
+  public async getAllPortsEnabled(): Promise<boolean[] | null> {
+    // Query the device for the current port enabled status. 
+    // This logs in if needed.
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) {
+      return null;
+    }
+    const portSettings = await this.getPortSettings();
+    if (!portSettings) {
+      return null;
+    }
+    return portSettings.portEnabled;
+  }
+
   public async getPortEnabled(port: number): Promise<boolean | null> {
     // Query the device for the current port enabled status.
     // This logs in if needed.
