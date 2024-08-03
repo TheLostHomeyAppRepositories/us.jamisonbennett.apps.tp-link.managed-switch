@@ -11,6 +11,8 @@ export interface SystemInfo {
 export interface PortSettings {
   numPorts: number;
   portEnabled: boolean[];
+  flowControl: boolean[];
+  speed: number[];
 }
 
 class DeviceAPI {
@@ -198,6 +200,8 @@ class DeviceAPI {
       // Extract the port setting from the response
       const maxPortMatch = data.match(/var\s+max_port_num\s*=\s*(\d+);/);
       const stateMatch = data.match(/state:\s*\[([^\]]+)\]/);
+      const flowControlMatch = data.match(/fc_cfg:\s*\[([^\]]+)\]/);
+      const speedMatch = data.match(/spd_cfg:\s*\[([^\]]+)\]/);
 
       if (!maxPortMatch || !maxPortMatch[1]) {
         throw new Error('Max port number not found in the response.');
@@ -207,15 +211,32 @@ class DeviceAPI {
         throw new Error('Port state not found in the response.');
       }
 
+      if (!flowControlMatch || !flowControlMatch[1]) {
+        throw new Error('Port flow control not found in the response.');
+      }
+
+      if (!speedMatch || !speedMatch[1]) {
+        throw new Error('Port speed not found in the response.');
+      }
+
       const numPorts = parseInt(maxPortMatch[1]);
       const stateArray = stateMatch[1].split(',')
         .map((num: string) => parseInt(num.trim()))
         .slice(0, numPorts)
         .map((state: number) => state == 1);
+      const flowControlArray = flowControlMatch[1].split(',')
+        .map((num: string) => parseInt(num.trim()))
+        .slice(0, numPorts)
+        .map((state: number) => state == 1);
+      const speedArray = speedMatch[1].split(',')
+        .map((num: string) => parseInt(num.trim()))
+        .slice(0, numPorts);
 
       const portSettings: PortSettings = {
         numPorts: parseInt(maxPortMatch[1]),
-        portEnabled: stateArray
+        portEnabled: stateArray,
+        flowControl: flowControlArray,
+        speed: speedArray
       };
       return portSettings;
     } catch (error) {
@@ -259,6 +280,11 @@ class DeviceAPI {
     const state = enabled ? 1 : 0;
 
     try {
+      const portSettings = await this.getPortSettings();
+      if (portSettings == null) {
+        return false;
+      }
+
       // NOTE: The device uses HTTP GET for changing the configuration.
       const response = await axios.get(`http://${this.ipAddress}/port_setting.cgi`, {
         headers: {
@@ -267,8 +293,8 @@ class DeviceAPI {
         params: {
           portid: port,
           state: state,
-          speed: 1,
-          flowcontrol: 0,
+          speed: portSettings.speed[port-1],
+          flowcontrol: portSettings.flowControl[port-1] ? 1 : 0,
           apply: "Apply"
         }
       });
