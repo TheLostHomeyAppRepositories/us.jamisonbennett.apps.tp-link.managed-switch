@@ -5,6 +5,18 @@ class Driver extends Homey.Driver {
 
   async onInit() {
     this.log('TP-Link managed switch driver has been initialized');
+
+    const enablePortAction = this.homey.flow.getActionCard('enable_port');
+    enablePortAction.registerRunListener(async (args: any, state: any) => {
+      this.validateActionCardArgs(args);
+      return args.device.onCapabilityOnoff(args.port, true);
+    });
+
+    const disablePortAction = this.homey.flow.getActionCard('disable_port');
+    disablePortAction.registerRunListener(async (args: any, state: any) => {
+      this.validateActionCardArgs(args);
+      return args.device.onCapabilityOnoff(args.port, false);
+    });
   }
 
   async onPair(session: Homey.Driver.PairSession) {
@@ -55,6 +67,15 @@ class Driver extends Homey.Driver {
       await session.done();
       return true;
     });
+  }
+
+  private validateActionCardArgs(args: any) {
+    if (!args.device) {
+      throw Error('Switch device is not available');
+    }
+    if (!args.port || !Number.isInteger(args.port)) {
+      throw Error('Port number is unknown');
+    }
   }
 
 }

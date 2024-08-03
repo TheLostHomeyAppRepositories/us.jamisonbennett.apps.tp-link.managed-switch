@@ -1,0 +1,44 @@
+{
+  "actions": [
+    {
+      "id": "enable_port",
+      "title": {
+        "en": "Enable switch port"
+      },
+      "titleFormatted": {
+        "en": "Enable switch port [[port]]"
+      },
+      "args": [
+        {
+          "name": "port",
+          "type": "number",
+          "title": {
+            "en": "port number"
+          },
+          "min": 1,
+          "max": 128
+        }
+      ]
+    },
+    {
+      "id": "disable_port",
+      "title": {
+        "en": "Disable switch port"
+      },
+      "titleFormatted": {
+        "en": "Disable switch port [[port]]"
+      },
+      "args": [
+        {
+          "name": "port",
+          "type": "number",
+          "title": {
+            "en": "port number"
+          },
+          "min": 1,
+          "max": 128
+        }
+      ]
+    }
+  ]
+}
