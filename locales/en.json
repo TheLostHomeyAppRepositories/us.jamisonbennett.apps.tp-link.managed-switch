@@ -2,7 +2,6 @@
   "settings": {
     "drivers": {
       "tp-link-managed-switch": {
-        "defaultPort": "Default Port",
         "portName": "Port __number__",
         "pair": {
           "connection_input": {

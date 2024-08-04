@@ -20,37 +20,32 @@ class Device extends Homey.Device {
       this.log("Unable to connect to managed switch");
     }
 
-    const defaultCapability = "onoff.default";
-    await this.addCapability(defaultCapability);
-    this.registerCapabilityListener(defaultCapability, this.onCapabilityOnoffDefault.bind(this));
+    this.registerCapabilityListener("onoff", this.onCapabilityOnoffDefault.bind(this));
 
-    const defaultTitle = this.homey.__(`settings.drivers.tp-link-managed-switch.defaultPort`);
-    await this.setCapabilityOptions(defaultCapability, {
-      title: defaultTitle
-    });
-
+    // Await for each one in order so they are properly ordered
     for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
-      this.log(`Loading switch port ${i}`);
-      const capability = `onoff.${i}`;
-      await this.addCapability(capability);
-      this.registerCapabilityListener(capability, this.onCapabilityOnoff.bind(this, i));
-
-      const title = this.homey.__(`settings.drivers.tp-link-managed-switch.portName`, { number: i });
-      await this.setCapabilityOptions(capability, {
-        title: title
-      });
+      await this.addCapabilityIfNeeded(i);
     }
 
-    await this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
+    await this.waitForInitialCapabilityRegistrationToFinish();
 
-    // Set the current values of each switch
-    this.refreshState();
+    const promises = [];
+    for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
+      promises.push(this.setupCapability(i));
+    }
+
+    this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
 
     this.refreshInterval = setInterval(() => {
       this.refreshState().catch(error => {
         this.log('Error refreshing state: ', error);
       });
     }, this.refeshTimeIterval);
+
+    return Promise.all(promises).then(() => {
+      // Set the current values of each switch
+      return this.refreshState();
+    });
   }
 
   async onUninit() {
@@ -60,24 +55,84 @@ class Device extends Homey.Device {
     }
   }
 
+  private async addCapabilityIfNeeded(port: number) {
+    // Avoid adding a capability that already exists since it is an expensive operation
+    const capability = `onoff.${port}`;
+    if (!this.getCapabilities().includes(capability)) {
+      return this.addCapability(capability);
+    }
+  }
+
+  private async setupCapability(port: number) {
+    const capability = `onoff.${port}`;
+
+    this.registerCapabilityListener(capability, this.onCapabilityOnoff.bind(this, port));
+
+    // Avoid setting capability options (ie title) if it already is set since it is an expensive operation.
+    // Checking if its already set can thrown an exception if its not set.
+    let needToSetTitle = true;
+    const title = this.homey.__(`settings.drivers.tp-link-managed-switch.portName`, { number: port });
+    try {
+      needToSetTitle = title != this.getCapabilityOptions(capability).title;
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('Invalid Capability:')) {
+        // ignore if the capability is not registered because this just means it needs to be registered
+      } else {
+        throw error;
+      }
+    }
+    if (needToSetTitle) {
+      return this.setCapabilityOptions(capability, {
+        title: title
+      });
+    }
+  }
+
+  async waitForInitialCapabilityRegistrationToFinish(retries: number = 100, retryDelay: number = 100): Promise<void> {
+    // Sometimes the registered capabilities are not registered eventhough the promise for registering comes before the code that uses the capability.
+    // This allows all of the capabilities to register before using them.
+    const registeredCapabilities = this.getCapabilities();
+    const requiredCapabilities = ["onoff"];
+    if (this.deviceAPI) {
+      for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
+        requiredCapabilities.push(`onoff.${i}`);
+      }
+    }
+
+    if (requiredCapabilities.every(capability => registeredCapabilities.includes(capability))) {
+      return;
+    }
+
+    if (retries > 0) {
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      return this.waitForInitialCapabilityRegistrationToFinish(retries - 1, retryDelay);
+    }
+
+    throw new Error('Failed to register all required capabilities within the expected time.');
+  }
+
   async refreshState() {
     if (this.deviceAPI == null) {
       return;
     }
+
+    const promises = [];
 
     // Set the current values of each switch
     const portStatus = await this.deviceAPI.getAllPortsEnabled();
     if (portStatus) {
       const defaultPortNumber = this.getSetting('default_port_number') || 0;
       if (defaultPortNumber == 0) {
-        await this.setCapabilityValue(`onoff.default`, true);
+        promises.push(this.setCapabilityValue(`onoff`, true));
       } else if (defaultPortNumber > 0 && defaultPortNumber <= portStatus.length) {
-        await this.setCapabilityValue(`onoff.default`, portStatus[defaultPortNumber-1]);
+        promises.push(this.setCapabilityValue(`onoff`, portStatus[defaultPortNumber-1]));
       }
       for (let i = 0; i < portStatus.length; i++) {
-        await this.setCapabilityValue(`onoff.${i+1}`, portStatus[i]);
+        promises.push(this.setCapabilityValue(`onoff.${i+1}`, portStatus[i]));
       }
     }
+
+    return Promise.all(promises).then(() => undefined);
   }
 
   async onCapabilityOnoff(port: number, value: boolean) {
@@ -137,8 +192,8 @@ class Device extends Homey.Device {
         }
       }
 
-      // Refresh the default swich state
-      this.refreshState().then(() => undefined);
+      // Refresh the default switch state
+      this.refreshState();
     } catch (error) {
       if (error instanceof Error) {
         this.log("Invalid default port number:", error.message);

@@ -51,15 +51,12 @@ class DeviceAPI {
     // Check to see if the current login works and only login if needed.
     // Cookies can expire or the session can be invalidated.
     // The device invalidates the existing session when anyone logs in.
-    let systemInfo = await this.getSystemInfo();
-    if (!systemInfo) {
-      const isLoggedIn = await this.login();
-      if (!isLoggedIn) {
-        return false;
-      }
-      systemInfo = await this.getSystemInfo();
+    const systemInfo = await this.getSystemInfo();
+    if (systemInfo) {
+      return true;
     }
-    return systemInfo != null;
+    const isLoggedIn = await this.login();
+    return isLoggedIn;
   }
 
   public async connect(): Promise<boolean> {
