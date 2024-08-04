@@ -123,16 +123,23 @@ class Device extends Homey.Device {
     if (portStatus) {
       const defaultPortNumber = this.getSetting('default_port_number') || 0;
       if (defaultPortNumber == 0) {
-        promises.push(this.setCapabilityValue(`onoff`, true));
+        promises.push(this.setCapabilityIfNeeded(`onoff`, true));
       } else if (defaultPortNumber > 0 && defaultPortNumber <= portStatus.length) {
-        promises.push(this.setCapabilityValue(`onoff`, portStatus[defaultPortNumber-1]));
+        promises.push(this.setCapabilityIfNeeded(`onoff`, portStatus[defaultPortNumber-1]));
       }
       for (let i = 0; i < portStatus.length; i++) {
-        promises.push(this.setCapabilityValue(`onoff.${i+1}`, portStatus[i]));
+        promises.push(this.setCapabilityIfNeeded(`onoff.${i+1}`, portStatus[i]));
       }
     }
 
     return Promise.all(promises).then(() => undefined);
+  }
+
+  private async setCapabilityIfNeeded(capabilityId: string, newValue: boolean) {
+    const currentValue = this.getCapabilityValue(capabilityId);
+    if (currentValue != newValue) {
+      return this.setCapabilityValue(capabilityId, newValue);
+    }
   }
 
   async onCapabilityOnoff(port: number, value: boolean) {
