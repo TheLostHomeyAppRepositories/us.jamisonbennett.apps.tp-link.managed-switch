@@ -8,14 +8,25 @@ class Driver extends Homey.Driver {
 
     const enablePortAction = this.homey.flow.getActionCard('enable_port');
     enablePortAction.registerRunListener(async (args: any, state: any) => {
-      this.validateActionCardArgs(args);
+      this.validatePortActionCardArgs(args);
       return args.device.onCapabilityOnoff(args.port, true);
     });
 
     const disablePortAction = this.homey.flow.getActionCard('disable_port');
     disablePortAction.registerRunListener(async (args: any, state: any) => {
-      this.validateActionCardArgs(args);
+      this.validatePortActionCardArgs(args);
       return args.device.onCapabilityOnoff(args.port, false);
+    });
+
+    const enableLedsAction = this.homey.flow.getActionCard('enable_leds');
+    enableLedsAction.registerRunListener(async (args: any, state: any) => {
+      this.validateActionCardArgs(args);
+      return args.device.onCapabilityOnoffLeds(true);
+    });
+    const disableLedsAction = this.homey.flow.getActionCard('disable_leds');
+    disableLedsAction.registerRunListener(async (args: any, state: any) => {
+      this.validateActionCardArgs(args);
+      return args.device.onCapabilityOnoffLeds(false);
     });
   }
 
@@ -73,6 +84,10 @@ class Driver extends Homey.Driver {
     if (!args.device) {
       throw Error('Switch device is not available');
     }
+  }
+
+  private validatePortActionCardArgs(args: any) {
+    this.validateActionCardArgs(args);
     if (!args.port || !Number.isInteger(args.port)) {
       throw Error('Port number is unknown');
     }

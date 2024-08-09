@@ -325,6 +325,84 @@ class DeviceAPI {
     return Number.isInteger(port) && port >= 1 && port <= this.numPorts;
   }
 
+  public async getLedsEnabled(): Promise<boolean | null> {
+    // Query the device for the current LED enabled status.
+    // This logs in if needed.
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) {
+      return null;
+    }
+
+    return this.getLedSettings();
+  }
+
+  private async getLedSettings(): Promise<boolean | null> {
+    // Gets the device's port settings
+    if (!this.cookie) {
+      this.log('Error: No valid session cookie found. Please connect first.');
+      return null;
+    }
+
+    try {
+      const response = await axios.get(`http://${this.ipAddress}/TurnOnLEDRpm.htm`, {
+        headers: {
+          'Cookie': this.cookie
+        }
+      });
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP status ${response.status}`);
+      }
+
+      const data = await response.data;
+
+      // Extract the port setting from the response
+      const ledMatch = data.match(/var\s+led\s*=\s*(\d+)\s*/);
+
+      if (!ledMatch || !ledMatch[1]) {
+        throw new Error('LED status not found in the response.');
+      }
+
+      return parseInt(ledMatch[1]) == 1;
+    } catch (error) {
+      this.log(`Error fetching LED settings: ${error instanceof Error ? error.message : 'an unknown error occurred.'}`);
+      return null;
+    }
+  }
+
+  public async setLedsEnabled(enabled: boolean): Promise<boolean> {
+    // Enabled or disables the LEDs
+    // This logs in if needed.
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) { 
+      return false;
+    } 
+        
+    const state = enabled ? 1 : 0;
+    
+    try {
+      // NOTE: The device uses HTTP GET for changing the configuration.
+      const response = await axios.get(`http://${this.ipAddress}/led_on_set.cgi`, {
+        headers: {
+          'Cookie': this.cookie
+        },
+        params: {
+          rd_led: state,
+          led_cfg: "Apply"
+        }
+      });
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP status ${response.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      this.log(`Error setting LED state: ${error instanceof Error ? error.message : 'an unknown error occurred.'}`);
+      return false;
+    }
+  }
+
   private log(message: string) {
     console.log(message); // TODO
   }

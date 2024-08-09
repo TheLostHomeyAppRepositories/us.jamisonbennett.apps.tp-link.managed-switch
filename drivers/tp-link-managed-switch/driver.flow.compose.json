@@ -39,6 +39,24 @@
           "max": 48
         }
       ]
+    },
+    {
+      "id": "enable_leds",
+      "title": {
+        "en": "Enable LEDs"
+      },
+      "titleFormatted": {
+        "en": "Enable LEDs"
+      }
+    },
+    {
+      "id": "disable_leds",
+      "title": {
+        "en": "Disable LEDs"
+      },
+      "titleFormatted": {
+        "en": "Disable LEDs"
+      }
     }
   ]
 }

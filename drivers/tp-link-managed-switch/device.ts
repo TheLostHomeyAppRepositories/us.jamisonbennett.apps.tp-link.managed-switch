@@ -21,6 +21,7 @@ class Device extends Homey.Device {
     }
 
     this.registerCapabilityListener("onoff", this.onCapabilityOnoffDefault.bind(this));
+    this.registerCapabilityListener("onoff.leds", this.onCapabilityOnoffLeds.bind(this));
 
     // Await for each one in order so they are properly ordered
     for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
@@ -130,6 +131,10 @@ class Device extends Homey.Device {
       for (let i = 0; i < portStatus.length; i++) {
         promises.push(this.setCapabilityIfNeeded(`onoff.${i+1}`, portStatus[i]));
       }
+    }
+    const ledStatus = await this.deviceAPI.getLedsEnabled();
+    if (ledStatus != null) {
+      promises.push(this.setCapabilityIfNeeded(`onoff.leds`, ledStatus));
     }
 
     return Promise.all(promises).then(() => undefined);
@@ -260,6 +265,21 @@ class Device extends Homey.Device {
     });
 
     return ports;
+  }
+
+  async onCapabilityOnoffLeds(value: boolean) {
+    this.log(`Turning the leds ${value ? 'on' : 'off'}`);
+
+    if (this.deviceAPI == null) {
+      this.log(`Unable to set the LEDs ${value ? 'on' : 'off'} because the device is not initialized.`);
+      throw new Error(`Unable to set the LEDs ${value ? 'on' : 'off'} because the device is not initialized.`);
+    }
+    const result = await this.deviceAPI.setLedsEnabled(value);
+    if (!result) {
+      this.log(`Unable to set the LEDs ${value ? 'on' : 'off'}`);
+      throw new Error(`Unable to set the LEDs ${value ? 'on' : 'off'}`);
+    } 
+    return this.refreshState();
   }
 }
 
