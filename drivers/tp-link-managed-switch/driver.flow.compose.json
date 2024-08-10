@@ -57,6 +57,15 @@
       "titleFormatted": {
         "en": "Disable LEDs"
       }
+    },
+    {
+      "id": "restart",
+      "title": {
+        "en": "Restart"
+      },
+      "titleFormatted": {
+        "en": "Restart"
+      }
     }
   ]
 }

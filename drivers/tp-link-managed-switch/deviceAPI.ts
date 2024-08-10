@@ -403,6 +403,32 @@ class DeviceAPI {
     }
   }
 
+  public async restart(): Promise<boolean> {
+    // Restart the switch
+    // This logs in if needed.
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) {
+      return false;
+    }
+  
+    try {
+      const response = await axios.post(`http://${this.ipAddress}/reboot.cgi`, null, {
+        headers: {
+          'Cookie': this.cookie
+        }
+      });
+      
+      if (response.status !== 200) {
+        throw new Error(`HTTP status ${response.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      this.log(`Error restarting the swtich: ${error instanceof Error ? error.message : 'an unknown error occurred.'}`);
+      return false;
+    } 
+  }
+
   private log(message: string) {
     console.log(message); // TODO
   }

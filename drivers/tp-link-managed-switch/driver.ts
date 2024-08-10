@@ -28,6 +28,12 @@ class Driver extends Homey.Driver {
       this.validateActionCardArgs(args);
       return args.device.onCapabilityOnoffLeds(false);
     });
+
+    const restartAction = this.homey.flow.getActionCard('restart');
+    restartAction.registerRunListener(async (args: any, state: any) => {
+      this.validateActionCardArgs(args);
+      return args.device.restart();
+    });
   }
 
   async onPair(session: Homey.Driver.PairSession) {

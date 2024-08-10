@@ -281,6 +281,20 @@ class Device extends Homey.Device {
     } 
     return this.refreshState();
   }
+
+  async restart() {
+    this.log("Restarting managed switch");
+
+    if (this.deviceAPI == null) {
+      this.log(`Unable to restart the manged switch because the device is not initialized.`);
+      throw new Error(`Unable to restart the manged switch because the device is not initialized.`);
+    }
+    const result = await this.deviceAPI.restart();
+    if (!result) {
+      this.log(`Unable to restart the manged switch.`);
+      throw new Error(`Unable to restart the manged switch.`);
+    }
+  }
 }
 
 module.exports = Device;
