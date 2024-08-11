@@ -13,6 +13,7 @@ export interface PortSettings {
   portEnabled: boolean[];
   flowControl: boolean[];
   speed: number[];
+  linkUp: boolean[];
 }
 
 class DeviceAPI {
@@ -199,6 +200,7 @@ class DeviceAPI {
       const stateMatch = data.match(/state:\s*\[([^\]]+)\]/);
       const flowControlMatch = data.match(/fc_cfg:\s*\[([^\]]+)\]/);
       const speedMatch = data.match(/spd_cfg:\s*\[([^\]]+)\]/);
+      const linkUpMatch = data.match(/spd_act:\s*\[([^\]]+)\]/);
 
       if (!maxPortMatch || !maxPortMatch[1]) {
         throw new Error('Max port number not found in the response.');
@@ -216,6 +218,10 @@ class DeviceAPI {
         throw new Error('Port speed not found in the response.');
       }
 
+      if (!linkUpMatch || !linkUpMatch[1]) {
+        throw new Error('Actual port speed not found in the response.');
+      }
+
       const numPorts = parseInt(maxPortMatch[1]);
       const stateArray = stateMatch[1].split(',')
         .map((num: string) => parseInt(num.trim()))
@@ -228,12 +234,17 @@ class DeviceAPI {
       const speedArray = speedMatch[1].split(',')
         .map((num: string) => parseInt(num.trim()))
         .slice(0, numPorts);
+      const linkUpArray = linkUpMatch[1].split(',')
+        .map((num: string) => parseInt(num.trim()))
+        .slice(0, numPorts)
+        .map((state: number) => state != 0);
 
       const portSettings: PortSettings = {
         numPorts: parseInt(maxPortMatch[1]),
         portEnabled: stateArray,
         flowControl: flowControlArray,
-        speed: speedArray
+        speed: speedArray,
+        linkUp: linkUpArray
       };
       return portSettings;
     } catch (error) {
@@ -427,6 +438,23 @@ class DeviceAPI {
       this.log(`Error restarting the swtich: ${error instanceof Error ? error.message : 'an unknown error occurred.'}`);
       return false;
     } 
+  }
+
+  public async isLinkUp(port: number): Promise<boolean | null> {
+    // Query the device for the current link status
+    // This logs in if needed.
+    if (!this.isValidPort(port)) {
+      return null;
+    } 
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) {
+      return null;
+    } 
+    const portSettings = await this.getPortSettings();
+    if (!portSettings) { 
+      return null;
+    } 
+    return portSettings.linkUp[port - 1];
   }
 
   private log(message: string) {

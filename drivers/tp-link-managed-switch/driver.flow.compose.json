@@ -1,4 +1,46 @@
 {
+  "conditions": [
+    {
+      "id": "link_up",
+      "title": {
+        "en": "Switch port link is up"
+      },
+      "titleFormatted": {
+        "en": "Switch port [[port]] link is up"
+      },
+      "args": [
+        {
+          "name": "port",
+          "type": "number",
+          "title": {
+            "en": "port number"
+          },
+          "min": 1,
+          "max": 48
+        }
+      ]
+    },
+    {
+      "id": "link_down",
+      "title": {
+        "en": "Switch port link is down"
+      },
+      "titleFormatted": {
+        "en": "Switch port [[port]] link is down"
+      },
+      "args": [
+        {
+          "name": "port",
+          "type": "number",
+          "title": {
+            "en": "port number"
+          },
+          "min": 1,
+          "max": 48
+        }
+      ]
+    }
+  ],
   "actions": [
     {
       "id": "enable_port",

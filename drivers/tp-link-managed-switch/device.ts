@@ -295,6 +295,21 @@ class Device extends Homey.Device {
       throw new Error(`Unable to restart the manged switch.`);
     }
   }
+
+  async isLinkUp(port: number): Promise<boolean> {
+    this.log(`Checking if link is up for port ${port}.`);
+
+    if (this.deviceAPI == null) {
+      this.log(`Unable to check if the link is up because the device is not initialized.`);
+      throw new Error(`Unable to check if the link is up because the device is not initialized.`);
+    }
+    const result = await this.deviceAPI.isLinkUp(port);
+    if (result == null) {
+      this.log(`Unable to check if the link is up.`);
+      throw new Error(`Unable to check if the link is up.`);
+    }
+    return result;
+  } 
 }
 
 module.exports = Device;
