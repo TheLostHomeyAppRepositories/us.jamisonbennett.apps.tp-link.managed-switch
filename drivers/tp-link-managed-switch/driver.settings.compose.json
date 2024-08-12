@@ -1,15 +1,15 @@
 [
   {
-    "id": "default_port_number",
+    "id": "favorite_port_number",
     "type": "number",
     "label": {
-      "en": "Default port"
+      "en": "Favorite port"
     },
     "value": 0,
     "min": 0,
     "max": 48,
     "hint": {
-      "en": "Port 0 will disable the default port. The port must exist on the device."
+      "en": "Port 0 will disable the favorite port. The port must exist on the device."
     }
   },
   {

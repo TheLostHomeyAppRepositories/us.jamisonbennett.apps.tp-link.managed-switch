@@ -20,7 +20,7 @@ class Device extends Homey.Device {
       this.log("Unable to connect to managed switch");
     }
 
-    this.registerCapabilityListener("onoff", this.onCapabilityOnoffDefault.bind(this));
+    this.registerCapabilityListener("onoff.favorite", this.onCapabilityOnoffFavorite.bind(this));
     this.registerCapabilityListener("onoff.leds", this.onCapabilityOnoffLeds.bind(this));
 
     // Await for each one in order so they are properly ordered
@@ -93,7 +93,7 @@ class Device extends Homey.Device {
     // Sometimes the registered capabilities are not registered eventhough the promise for registering comes before the code that uses the capability.
     // This allows all of the capabilities to register before using them.
     const registeredCapabilities = this.getCapabilities();
-    const requiredCapabilities = ["onoff"];
+    const requiredCapabilities = ["onoff.favorite"];
     if (this.deviceAPI) {
       for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
         requiredCapabilities.push(`onoff.${i}`);
@@ -124,9 +124,9 @@ class Device extends Homey.Device {
     if (portStatus) {
       const defaultPortNumber = this.getSetting('default_port_number') || 0;
       if (defaultPortNumber == 0) {
-        promises.push(this.setCapabilityIfNeeded(`onoff`, true));
+        promises.push(this.setCapabilityIfNeeded(`onoff.favorite`, true));
       } else if (defaultPortNumber > 0 && defaultPortNumber <= portStatus.length) {
-        promises.push(this.setCapabilityIfNeeded(`onoff`, portStatus[defaultPortNumber-1]));
+        promises.push(this.setCapabilityIfNeeded(`onoff.favorite`, portStatus[defaultPortNumber-1]));
       }
       for (let i = 0; i < portStatus.length; i++) {
         promises.push(this.setCapabilityIfNeeded(`onoff.${i+1}`, portStatus[i]));
@@ -166,21 +166,21 @@ class Device extends Homey.Device {
     return this.refreshState();
   }
 
-  async onCapabilityOnoffDefault(value: boolean) {
-    const defaultPortNumber = this.getSetting('default_port_number') || 0;
-    this.log(`Turning the default switch port ${defaultPortNumber} ${value ? 'on' : 'off'}`);
-    if (defaultPortNumber == 0) {
-      // There is no default port
+  async onCapabilityOnoffFavorite(value: boolean) {
+    const favoritePortNumber = this.getSetting('favorite_port_number') || 0;
+    this.log(`Turning the favorite switch port ${favoritePortNumber} ${value ? 'on' : 'off'}`);
+    if (favoritePortNumber == 0) {
+      // There is no favorite port
       return this.refreshState();
     }
 
-    return this.onCapabilityOnoff(defaultPortNumber, value);
+    return this.onCapabilityOnoff(favoritePortNumber, value);
   }
 
   async onSettings({ oldSettings, newSettings, changedKeys }: { oldSettings: any, newSettings: any, changedKeys: string[] }) {
 
-    if (changedKeys.includes('default_port_number')) {
-      this.handleDefaultPortChange(newSettings.default_port_number);
+    if (changedKeys.includes('favorite_port_number')) {
+      this.handleDefaultPortChange(newSettings.favorite_port_number);
     }
 
     if (changedKeys.includes('configurable_ports')) {
@@ -204,15 +204,15 @@ class Device extends Homey.Device {
         }
       }
 
-      // Refresh the default switch state
+      // Refresh the favorite switch state
       this.refreshState();
     } catch (error) {
       if (error instanceof Error) {
-        this.log("Invalid default port number:", error.message);
-        throw new Error(`Invalid default port number ${error.message}`);
+        this.log("Invalid favorite port number:", error.message);
+        throw new Error(`Invalid favorite port number ${error.message}`);
       } else {
-        this.log("Invalid default port number");
-        throw new Error("Invalid default port number");
+        this.log("Invalid favorite port number");
+        throw new Error("Invalid favorite port number");
       }
     }
   }

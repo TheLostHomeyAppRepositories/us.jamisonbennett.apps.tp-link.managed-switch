@@ -4,13 +4,13 @@
   },
   "class": "other",
   "capabilities": [
-    "onoff",
+    "onoff.favorite",
     "onoff.leds"
   ],
   "capabilitiesOptions": {
-    "onoff": {
+    "onoff.favorite": {
       "title": {
-        "en": "Default Port"
+        "en": "Favorite Port"
       }
     },
     "onoff.leds": {
