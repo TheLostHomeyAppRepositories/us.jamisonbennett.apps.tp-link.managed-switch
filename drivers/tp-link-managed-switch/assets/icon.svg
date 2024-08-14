@@ -1,0 +1,48 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="960" height="960" viewBox="0,0,960,960">
+  <g fill="none" fill-rule="nonzero" stroke="#000000" stroke-width="none" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal">
+    <path d="M200,570v-180h680v180z" id="Path 1" fill="none" stroke-width="40"/>
+    <path d="M60,520v-80h1v80z" id="Path 1" fill="none" stroke-width="20"/>
+    <path d="M60,440 L200,380" fill="none" stroke="#000000" stroke-width="20"/>
+    <path d="M60,520 L200,580" fill="none" stroke="#000000" stroke-width="20"/>
+    <g id="Port 1" stroke-width="10" fill="none">
+      <path d="M270,520v-20" id="Path 1"/>
+      <path d="M290,520v-20" id="Path 1"/>
+      <path d="M310,520v-20" id="Path 1"/>
+      <path d="M330,520v-20" id="Path 1"/>
+      <path d="M270,470v-30h60v30z" id="Path 1"/>
+      <path d="M250,520v-50h100v50z" id="Path 1"/>
+    </g>
+    <g id="Port 2" stroke-width="10" fill="none">
+      <path d="M390,520v-20" id="Path 1"/>
+      <path d="M410,520v-20" id="Path 1"/>
+      <path d="M430,520v-20" id="Path 1"/>
+      <path d="M450,520v-20" id="Path 1"/>
+      <path d="M390,470v-30h60v30z" id="Path 1"/>
+      <path d="M370,520v-50h100v50z" id="Path 1"/>
+    </g>
+    <g id="Port 3" stroke-width="10" fill="none">
+      <path d="M510,520v-20" id="Path 1"/>
+      <path d="M530,520v-20" id="Path 1"/>
+      <path d="M550,520v-20" id="Path 1"/>
+      <path d="M570,520v-20" id="Path 1"/>
+      <path d="M510,470v-30h60v30z" id="Path 1"/>
+      <path d="M490,520v-50h100v50z" id="Path 1"/>
+    </g>
+    <g id="Port 4" stroke-width="10" fill="none">
+      <path d="M630,520v-20" id="Path 1"/>
+      <path d="M650,520v-20" id="Path 1"/>
+      <path d="M670,520v-20" id="Path 1"/>
+      <path d="M690,520v-20" id="Path 1"/>
+      <path d="M630,470v-30h60v30z" id="Path 1"/>
+      <path d="M610,520v-50h100v50z" id="Path 1"/>
+    </g>
+    <g id="Port 5" stroke-width="10" fill="none">
+      <path d="M750,520v-20" id="Path 1"/>
+      <path d="M770,520v-20" id="Path 1"/>
+      <path d="M790,520v-20" id="Path 1"/>
+      <path d="M810,520v-20" id="Path 1"/>
+      <path d="M750,470v-30h60v30z" id="Path 1"/>
+      <path d="M730,520v-50h100v50z" id="Path 1"/>
+    </g>
+  </g>
+</svg>
