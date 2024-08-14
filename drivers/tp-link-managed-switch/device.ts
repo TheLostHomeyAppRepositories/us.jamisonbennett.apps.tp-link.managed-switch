@@ -35,6 +35,8 @@ class Device extends Homey.Device {
       promises.push(this.setupCapability(i));
     }
 
+    promises.push(this.setEnergy(this.energyUsage()));
+
     this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
 
     this.refreshInterval = setInterval(() => {
@@ -310,6 +312,20 @@ class Device extends Homey.Device {
     }
     return result;
   } 
+
+  private energyUsage() {
+    if (!this.deviceAPI) {
+      throw new Error("Unable to estimate energy usage with a device that is not initilized");
+    }
+
+    // The data sheet was used for a 24 port switch.
+    const wattsPerPort = 0.591;
+    return {
+      approximation: {
+        usageConstant: this.deviceAPI.getNumPorts() * wattsPerPort
+      }
+    };
+  }
 }
 
 module.exports = Device;
