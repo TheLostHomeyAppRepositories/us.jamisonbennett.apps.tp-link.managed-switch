@@ -1,4 +1,5 @@
 import Homey from 'homey';
+const Device = require('./device');
 import DeviceAPI from './deviceAPI';
 
 class Driver extends Homey.Driver {
@@ -81,7 +82,7 @@ class Driver extends Homey.Driver {
       const deviceData = {
         name: deviceAPI.getName(),
         data: {
-          id: deviceAPI.getMacAddress().replace(/:/g, ''),
+          id: deviceAPI.getMacAddress(),
         },
         store: {
           address: address,
@@ -90,6 +91,52 @@ class Driver extends Homey.Driver {
         },
       };
       return [deviceData];
+    });
+
+    session.setHandler('close_connection', async () => {
+      await session.done();
+      return true;
+    });
+  }
+
+  async onRepair(session: Homey.Driver.PairSession, device: Homey.Device) {
+    let address = "";
+    let username = "";
+    let password = "";
+    let deviceAPI: DeviceAPI | null = null
+
+    const deviceToRepair = device as InstanceType<typeof Device>;
+    if (!deviceToRepair) {
+      throw Error('Unsupported device');
+    }
+
+    session.setHandler("getDeviceMacAddress", async (data) => {
+      return {
+        macAddress: deviceToRepair.getData().id
+      };
+    });
+
+    session.setHandler("set_connection_info", async (data) => {
+      address = data.address;
+      username = data.username;
+      password = data.password;
+      await session.nextView();
+      return true;
+    });
+
+    session.setHandler('showView', async (view) => {
+      if (view === 'loading') {
+        deviceAPI = new DeviceAPI(address, username, password);
+        const result = await deviceAPI.connect();
+        if (result && this.isSameDevice(device, deviceAPI)) {
+          await deviceToRepair.repair(address, username, password);
+          await session.showView('done');
+        } else if (result) {
+          await session.showView('incorrect_device_error');
+        } else {
+          await session.showView('connection_error');
+        }
+      }
     });
 
     session.setHandler('close_connection', async () => {
@@ -109,6 +156,10 @@ class Driver extends Homey.Driver {
     if (!args.port || !Number.isInteger(args.port)) {
       throw Error('Port number is unknown');
     }
+  }
+
+  private isSameDevice(existingDevice: typeof Device, newDeviceAPI: DeviceAPI) {
+    return existingDevice.getData().id == newDeviceAPI.getMacAddress();
   }
 
 }

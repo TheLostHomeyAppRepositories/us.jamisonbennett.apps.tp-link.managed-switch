@@ -19,6 +19,31 @@
             "errorText": "Unabled to connect to the managed switch",
             "close": "Close"
           }
+        },
+        "repair": {
+          "connection_input": {
+            "title": "Repair connection to your managed switch",
+            "macLabel": "MAC address",
+            "macPlaceholder": "Loading...",
+            "addressLabel": "IP address or address",
+            "addressPlaceholder": "192.168.0.1 or managed-switch.local",
+            "usernameLabel": "Username",
+            "usernamePlaceholder": "admin",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "password",
+            "connect": "Connect",
+            "errorRetrievingMacAddress": "Error retrieving MAC address"
+          },
+          "connection_error": {
+            "title": "Connection error",
+            "errorText": "Unabled to connect to the managed switch",
+            "close": "Close"
+          },
+          "incorrect_device_error": {
+            "title": "Incorrect device error",
+            "errorText": "The provided connection address and login are to a different managed switch",
+            "close": "Close"
+          }
         }
       }
     }

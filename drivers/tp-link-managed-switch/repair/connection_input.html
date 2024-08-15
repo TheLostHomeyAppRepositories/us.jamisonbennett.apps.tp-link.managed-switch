@@ -1,0 +1,50 @@
+<script>
+  Homey.emit('getDeviceMacAddress', null, (err, result) => {
+    if (err || !result.macAddress) {
+      document.getElementById('macAddress').value = __('settings.drivers.tp-link-managed-switch.repair.connection_input.errorRetrievingMacAddress')
+    } else {
+      document.getElementById('macAddress').value = result.macAddress;
+    }
+  });
+</script>
+
+<style>
+  .homey-form-input.read-only-input {
+    background-color: #e9ecef !important; // Light gray background
+    color:            #6c757d !important; // Darker gray text
+    border-color:     #ced4da !important; // Light gray border
+    pointer-events:   none    !important; // Disables interaction
+  }
+</style>
+
+<h1 class="homey-title" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.title"></h1>
+
+<form id="connection-form" class="form-container">
+
+<div class="homey-form-group">
+  <label class="homey-form-label" for="macAddress" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.macLabel"></label>
+  <input class="homey-form-input read-only-input" id="macAddress" type="text" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.repair.connection_input.macPlaceholder" readonly />
+
+  <label class="homey-form-label" for="addresss" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.addressLabel"></label>
+  <input class="homey-form-input" id="address" type="text" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.repair.connection_input.addressPlaceholder" />
+
+  <label class="homey-form-label" for="username" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.usernameLabel"></label>
+  <input class="homey-form-input" id="username" type="text" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.repair.connection_input.usernamePlaceholder" />
+
+  <label class="homey-form-label" for="password" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.passwordLabel"></label>
+  <input class="homey-form-input" id="password" type="password" value="" data-i18n-placeholder="settings.drivers.tp-link-managed-switch.repair.connection_input.passwordPlaceholder" />
+</div>
+
+<button class="homey-button-primary-full" id="next" data-i18n="settings.drivers.tp-link-managed-switch.repair.connection_input.connect" type="button"></button>
+
+</form>
+
+<script type="application/javascript">
+  document.getElementById('next').addEventListener('click', function (e) {
+    const address = document.getElementById('address').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    Homey.emit("set_connection_info", { address, username, password });
+  });
+</script>
+

@@ -54,5 +54,24 @@
       "id": "done",
       "template": "done"
     }
+  ],
+  "repair": [
+    {
+      "id": "connection_input"
+    },
+    {
+      "id": "loading",
+      "template": "loading"
+    },
+    {
+      "id": "connection_error"
+    },
+    {
+      "id": "incorrect_device_error"
+    },
+    {
+      "id": "done",
+      "template": "done"
+    }
   ]
 }

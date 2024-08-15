@@ -3,19 +3,22 @@ import DeviceAPI from './deviceAPI';
 
 class Device extends Homey.Device {
 
+  private address: string = ""
+  private username: string = ""
+  private password: string = ""
   private deviceAPI: DeviceAPI | null = null
   private refreshInterval: NodeJS.Timeout | null = null
-  private refeshTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
+  private refreshTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
 
   private configurablePorts: boolean[] | null = null
 
   async onInit() {
     this.log('TP-Link managed switch device has been initialized');
 
-    const address = this.getStoreValue('address');
-    const username = this.getStoreValue('username');
-    const password = this.getStoreValue('password');
-    this.deviceAPI = new DeviceAPI(address, username, password);
+    this.address = this.getStoreValue('address');
+    this.username = this.getStoreValue('username');
+    this.password = this.getStoreValue('password');
+    this.deviceAPI = new DeviceAPI(this.address, this.username, this.password);
     if (!await this.deviceAPI.connect()) {
       this.log("Unable to connect to managed switch");
     }
@@ -43,7 +46,7 @@ class Device extends Homey.Device {
       this.refreshState().catch(error => {
         this.log('Error refreshing state: ', error);
       });
-    }, this.refeshTimeIterval);
+    }, this.refreshTimeIterval);
 
     return Promise.all(promises).then(() => {
       // Set the current values of each switch
@@ -325,6 +328,34 @@ class Device extends Homey.Device {
         usageConstant: this.deviceAPI.getNumPorts() * wattsPerPort
       }
     };
+  }
+
+  public async repair(address: string, username: string, password: string) {
+    this.log("Updating device");
+
+    const deviceAPI = new DeviceAPI(address, username, password);
+    if (!await deviceAPI.connect()) {
+      this.log("Unable to connect to managed switch");
+      throw new Error("Unable to connect to managed switch");
+    }
+
+    this.address = address;
+    this.username = username;
+    this.password = password;
+    this.deviceAPI = deviceAPI;
+
+    const promises = [];
+    promises.push(this.save());
+    promises.push(this.refreshState());
+    return Promise.all(promises).then(() => undefined);
+  }
+
+  public async save() {
+    const promises = [];
+    promises.push(this.setStoreValue('address', this.address));
+    promises.push(this.setStoreValue('username', this.username));
+    promises.push(this.setStoreValue('password', this.password));
+    return Promise.all(promises).then(() => undefined);
   }
 }
 
