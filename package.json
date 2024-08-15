@@ -1,6 +1,7 @@
 {
   "name": "us.jamisonbennett.apps.homey.tp-link.managed-switch",
   "version": "1.0.0",
+  "license": "MIT",
   "main": "app.ts",
   "scripts": {
     "build": "tsc",
