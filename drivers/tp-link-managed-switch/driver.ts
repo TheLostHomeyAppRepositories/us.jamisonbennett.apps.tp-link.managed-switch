@@ -1,3 +1,5 @@
+'use strict';
+
 import Homey from 'homey';
 const Device = require('./device');
 import DeviceAPI from './deviceAPI';
@@ -65,7 +67,7 @@ class Driver extends Homey.Driver {
 
     session.setHandler('showView', async (view) => {
       if (view === 'loading') {
-        deviceAPI = new DeviceAPI(address, username, password);
+        deviceAPI = new DeviceAPI(this, address, username, password);
         const result = await deviceAPI.connect();
         if (result) {
           await session.showView('list_devices');
@@ -126,7 +128,7 @@ class Driver extends Homey.Driver {
 
     session.setHandler('showView', async (view) => {
       if (view === 'loading') {
-        deviceAPI = new DeviceAPI(address, username, password);
+        deviceAPI = new DeviceAPI(this, address, username, password);
         const result = await deviceAPI.connect();
         if (result && this.isSameDevice(device, deviceAPI)) {
           await deviceToRepair.repair(address, username, password);

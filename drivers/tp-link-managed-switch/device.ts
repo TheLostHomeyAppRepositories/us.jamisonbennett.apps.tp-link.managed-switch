@@ -1,3 +1,5 @@
+'use strict';
+
 import Homey from 'homey';
 import DeviceAPI from './deviceAPI';
 
@@ -18,7 +20,7 @@ class Device extends Homey.Device {
     this.address = this.getStoreValue('address');
     this.username = this.getStoreValue('username');
     this.password = this.getStoreValue('password');
-    this.deviceAPI = new DeviceAPI(this.address, this.username, this.password);
+    this.deviceAPI = new DeviceAPI(this, this.address, this.username, this.password);
     if (!await this.deviceAPI.connect()) {
       this.log("Unable to connect to managed switch");
     }
@@ -333,7 +335,7 @@ class Device extends Homey.Device {
   public async repair(address: string, username: string, password: string) {
     this.log("Updating device");
 
-    const deviceAPI = new DeviceAPI(address, username, password);
+    const deviceAPI = new DeviceAPI(this, address, username, password);
     if (!await deviceAPI.connect()) {
       this.log("Unable to connect to managed switch");
       throw new Error("Unable to connect to managed switch");

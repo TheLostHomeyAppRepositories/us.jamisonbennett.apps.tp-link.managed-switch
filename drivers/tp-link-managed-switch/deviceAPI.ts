@@ -1,5 +1,8 @@
+'use strict';
+
 import Homey from 'homey';
 import axios from 'axios';
+import Logger from '../../lib/Logger';
 
 export interface SystemInfo {
   macAddress: string;
@@ -16,7 +19,7 @@ export interface PortSettings {
   linkUp: boolean[];
 }
 
-class DeviceAPI {
+class DeviceAPI extends Logger {
 
   private ipAddress: string;
   private username: string;
@@ -26,7 +29,8 @@ class DeviceAPI {
 
   private cookie: string = "";
 
-  constructor(ipAddress: string, username: string, password: string) {
+  constructor(logger: any, ipAddress: string, username: string, password: string) {
+    super(logger);
     this.ipAddress = ipAddress;
     this.username = username;
     this.password = password;
@@ -457,9 +461,6 @@ class DeviceAPI {
     return portSettings.linkUp[port - 1];
   }
 
-  private log(message: string) {
-    console.log(message); // TODO
-  }
 }
 
 export default DeviceAPI;
