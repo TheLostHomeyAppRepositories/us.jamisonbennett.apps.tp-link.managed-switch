@@ -25,5 +25,6 @@
     "name": "Jamison Bennett",
     "email": ""
   },
-  "brandColor": "#4ACBD6"
+  "brandColor": "#4ACBD6",
+  "support": "https://github.com/jamisonbennett/homey-tp-link-managed-switch"
 }

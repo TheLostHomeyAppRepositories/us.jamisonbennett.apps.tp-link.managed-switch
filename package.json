@@ -1,8 +1,18 @@
 {
-  "name": "us.jamisonbennett.apps.homey.tp-link.managed-switch",
-  "version": "1.0.0",
+  "name": "homey-tp-link-managed-switch",
+  "version": "0.1.0",
   "license": "MIT",
+  "author": "Jamison Bennett",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamisonbennett/homey-tp-link-managed-switch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jamisonbennett/homey-tp-link-managed-switch/issues"
+  },
+  "homepage": "https://github.com/jamisonbennett/homey-tp-link-managed-switch#readme",
   "main": "app.ts",
+  "description": "A Homey app for managing TP-Link managed switches",
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
@@ -17,5 +27,14 @@
   },
   "dependencies": {
     "axios": "^1.7.2"
+  },
+  "keywords": [
+    "homey",
+    "tp-link",
+    "switch",
+    "smart home"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
