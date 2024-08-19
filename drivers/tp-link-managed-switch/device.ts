@@ -96,7 +96,7 @@ class Device extends Homey.Device {
     }
   }
 
-  async waitForInitialCapabilityRegistrationToFinish(retries: number = 100, retryDelay: number = 100): Promise<void> {
+  private async waitForInitialCapabilityRegistrationToFinish(retries: number = 100, retryDelay: number = 100): Promise<void> {
     // Sometimes the registered capabilities are not registered eventhough the promise for registering comes before the code that uses the capability.
     // This allows all of the capabilities to register before using them.
     const registeredCapabilities = this.getCapabilities();
@@ -119,7 +119,7 @@ class Device extends Homey.Device {
     throw new Error('Failed to register all required capabilities within the expected time.');
   }
 
-  async refreshState() {
+  private async refreshState() {
     if (this.deviceAPI == null) {
       return;
     }

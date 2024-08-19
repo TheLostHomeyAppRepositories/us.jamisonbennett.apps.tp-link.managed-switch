@@ -145,10 +145,10 @@ class DeviceAPI extends Logger {
       const data = await response.data;
 
       // Extract the device info from the response
-      const macAddressMatch = data.match(/macStr:\[\n?"([^"]+)"\n?\]/);
-      const firmwareMatch = data.match(/firmwareStr:\[\n?"([^"]+)"\n?\]/);
-      const hardwareMatch = data.match(/hardwareStr:\[\n?"([^"]+)"\n?\]/);
-      const descriptionMatch = data.match(/descriStr:\[\n?"([^"]+)"\n?\]/);
+      const macAddressMatch = data.match(/macStr:\s?\[\n?\s*"([^"]+)"\n?\s*\]/);
+      const firmwareMatch = data.match(/firmwareStr:\s?\[\n?\s*"([^"]+)"\n?\s*\]/);
+      const hardwareMatch = data.match(/hardwareStr:\s?\[\n?\s*"([^"]+)"\n?\s*\]/);
+      const descriptionMatch = data.match(/descriStr:\s?\[\n?\s*"([^"]+)"\n?\s*\]/);
 
       if (!macAddressMatch || !macAddressMatch[1]) {
         throw new Error('MAC address not found in the response.');

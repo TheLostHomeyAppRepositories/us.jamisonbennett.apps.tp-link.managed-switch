@@ -52,6 +52,24 @@ The **TP-Link Managed Switch** app integrates TP-Link managed switches with your
 ## Contributing
 We welcome contributions to enhance this app! Please submit issues or pull requests on our [GitHub repository](https://github.com/jamisonbennett/homey-tp-link-managed-switch).
 
+## Building
+
+### Prepare the Environment
+
+Install the necessary dependencies: `npm install`
+
+### Run Unit Tests
+
+Execute the unit tests using Jest: `npx jest`
+
+### Run the App Locally
+
+Launch the app in development mode: `npx homey app run`
+
+### Install the App on Homey
+
+Deploy and install the app on your Homey device: `npx homey app install`
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
 

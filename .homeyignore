@@ -17,6 +17,8 @@ Thumbs.db
 # Ignore test files and directories
 test/
 tests/
+*.test.ts
+*.spec.ts
 
 # Ignore Git and version control specific files
 .git/
