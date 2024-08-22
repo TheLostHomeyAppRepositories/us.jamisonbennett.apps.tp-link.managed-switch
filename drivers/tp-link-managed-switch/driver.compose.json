@@ -1,8 +1,8 @@
 {
   "name": {
-    "en": "TP-Link managed switch"
+    "en": "TP-Link Managed Switch"
   },
-  "class": "other",
+  "class": "networkrouter",
   "capabilities": [
     "onoff.favorite",
     "onoff.leds"
