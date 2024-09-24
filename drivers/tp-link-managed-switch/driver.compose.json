@@ -11,12 +11,14 @@
     "onoff.favorite": {
       "title": {
         "en": "Favorite Port"
-      }
+      },
+      "uiQuickAction": false
     },
     "onoff.leds": {
       "title": {
         "en": "LEDs"
-      }
+      },
+      "uiQuickAction": false
     }
   },
   "platforms": [

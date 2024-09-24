@@ -79,9 +79,11 @@ class Device extends Homey.Device {
     // Avoid setting capability options (ie title) if it already is set since it is an expensive operation.
     // Checking if its already set can thrown an exception if its not set.
     let needToSetTitle = true;
+    let needToSetUiQuickAction = true;
     const title = this.homey.__(`settings.drivers.tp-link-managed-switch.portName`, { number: port });
     try {
       needToSetTitle = title != this.getCapabilityOptions(capability).title;
+      needToSetUiQuickAction = !this.getCapabilityOptions(capability).uiQuickAction;
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('Invalid Capability:')) {
         // ignore if the capability is not registered because this just means it needs to be registered
@@ -89,9 +91,10 @@ class Device extends Homey.Device {
         throw error;
       }
     }
-    if (needToSetTitle) {
+    if (needToSetTitle || needToSetUiQuickAction) {
       return this.setCapabilityOptions(capability, {
-        title: title
+        title: title,
+        uiQuickAction: false,
       });
     }
   }
