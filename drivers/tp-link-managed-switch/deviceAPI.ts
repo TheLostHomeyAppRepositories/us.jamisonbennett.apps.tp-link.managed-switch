@@ -52,12 +52,19 @@ class DeviceAPI extends Logger {
     return this.systemInfo ? this.systemInfo.hardwareVersion : "";
   }
 
+  public async isLoggedIn(): Promise<boolean> {
+    const systemInfo = await this.getSystemInfo();
+    if (systemInfo) {
+      return true;
+    }
+    return false;
+  }
+
   private async reloginIfNeeded(): Promise<boolean> {
     // Check to see if the current login works and only login if needed.
     // Cookies can expire or the session can be invalidated.
     // The device invalidates the existing session when anyone logs in.
-    const systemInfo = await this.getSystemInfo();
-    if (systemInfo) {
+    if (await this.isLoggedIn()) {
       return true;
     }
     const isLoggedIn = await this.login();

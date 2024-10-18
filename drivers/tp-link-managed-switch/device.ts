@@ -5,28 +5,62 @@ import DeviceAPI from './deviceAPI';
 
 class Device extends Homey.Device {
 
+  private needsFullRefresh = false;
+  private registeredCapabilities = new Set();
   private address: string = ""
   private username: string = ""
   private password: string = ""
   private deviceAPI: DeviceAPI | null = null
   private refreshInterval: NodeJS.Timeout | null = null
-  private refreshTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
+  private refreshTimeIterval = 60000; // 1 minute
+  private refreshAndLoginTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
+  private lastRefreshLoginTime = 0;
 
   private configurablePorts: boolean[] | null = null
 
   async onInit() {
     this.log('TP-Link managed switch device has been initialized');
 
+    this.registerCapabilityListener("onoff.favorite", this.onCapabilityOnoffFavorite.bind(this));
+    this.registerCapabilityListener("onoff.leds", this.onCapabilityOnoffLeds.bind(this));
+
+    this.refreshInterval = setInterval(async () => {
+      if (this.needsFullRefresh) {
+        this.fullRefresh().catch(async (error) => {
+          this.log('Error performing full refresh: ', error);
+          await this.setUnavailable(error);
+        });
+      } else {
+        const isLoggedIn = this.deviceAPI != null && (await this.deviceAPI.isLoggedIn());
+        const forceRefresh = Date.now() - this.lastRefreshLoginTime >= this.refreshAndLoginTimeIterval;
+        if (forceRefresh) {
+          this.lastRefreshLoginTime = Date.now();
+        }
+        if (isLoggedIn || forceRefresh) {
+          this.refreshState().catch(error => {
+            this.log('Error refreshing state: ', error);
+          });
+        }
+      }
+    }, this.refreshTimeIterval);
+
+    return this.fullRefresh().catch(async (error) => {
+      this.log('Error performing init: ', error);
+      await this.setUnavailable(error);
+    });
+  }
+
+  async fullRefresh() {
+    this.needsFullRefresh = true;
+
     this.address = this.getStoreValue('address');
     this.username = this.getStoreValue('username');
     this.password = this.getStoreValue('password');
     this.deviceAPI = new DeviceAPI(this, this.address, this.username, this.password);
+    this.lastRefreshLoginTime = Date.now();
     if (!await this.deviceAPI.connect()) {
-      this.log("Unable to connect to managed switch");
-    }
-
-    this.registerCapabilityListener("onoff.favorite", this.onCapabilityOnoffFavorite.bind(this));
-    this.registerCapabilityListener("onoff.leds", this.onCapabilityOnoffLeds.bind(this));
+      throw new Error("Unable to connect to managed switch");
+    } 
 
     // Await for each one in order so they are properly ordered
     for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
@@ -44,13 +78,9 @@ class Device extends Homey.Device {
 
     this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
 
-    this.refreshInterval = setInterval(() => {
-      this.refreshState().catch(error => {
-        this.log('Error refreshing state: ', error);
-      });
-    }, this.refreshTimeIterval);
-
-    return Promise.all(promises).then(() => {
+    return Promise.all(promises).then(async () => {
+      await this.setAvailable();
+      this.needsFullRefresh = false;
       // Set the current values of each switch
       return this.refreshState();
     });
@@ -74,7 +104,10 @@ class Device extends Homey.Device {
   private async setupCapability(port: number) {
     const capability = `onoff.${port}`;
 
-    this.registerCapabilityListener(capability, this.onCapabilityOnoff.bind(this, port));
+    if (!this.registeredCapabilities.has(capability)) {
+      this.registerCapabilityListener(capability, this.onCapabilityOnoff.bind(this, port));
+      this.registeredCapabilities.add(capability);
+    }
 
     // Avoid setting capability options (ie title) if it already is set since it is an expensive operation.
     // Checking if its already set can thrown an exception if its not set.
@@ -338,21 +371,12 @@ class Device extends Homey.Device {
   public async repair(address: string, username: string, password: string) {
     this.log("Updating device");
 
-    const deviceAPI = new DeviceAPI(this, address, username, password);
-    if (!await deviceAPI.connect()) {
-      this.log("Unable to connect to managed switch");
-      throw new Error("Unable to connect to managed switch");
-    }
-
     this.address = address;
     this.username = username;
     this.password = password;
-    this.deviceAPI = deviceAPI;
 
-    const promises = [];
-    promises.push(this.save());
-    promises.push(this.refreshState());
-    return Promise.all(promises).then(() => undefined);
+    await this.save();
+    return this.fullRefresh();
   }
 
   public async save() {
@@ -361,6 +385,18 @@ class Device extends Homey.Device {
     promises.push(this.setStoreValue('username', this.username));
     promises.push(this.setStoreValue('password', this.password));
     return Promise.all(promises).then(() => undefined);
+  }
+
+  public getAddress() {
+    return this.getStoreValue('address');
+  }
+
+  public getUsername() {
+    return this.getStoreValue('username');
+  }
+
+  public getPassword() {
+    return this.getStoreValue('password');
   }
 }
 

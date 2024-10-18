@@ -6,6 +6,16 @@
       document.getElementById('macAddress').value = result.macAddress;
     }
   });
+  Homey.emit('getConnectionInfo', null, (err, result) => {
+    if (!err) {
+      if (result.address) {
+        document.getElementById('address').value = result.address;
+      }
+      if (result.username) {
+        document.getElementById('username').value = result.username;
+      }
+    }
+  });
 </script>
 
 <style>

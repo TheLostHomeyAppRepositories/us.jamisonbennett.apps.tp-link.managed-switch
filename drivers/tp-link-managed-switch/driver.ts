@@ -118,10 +118,20 @@ class Driver extends Homey.Driver {
       };
     });
 
+    session.setHandler("getConnectionInfo", async (data) => {
+      return {
+        address: deviceToRepair.getAddress(),
+        username: deviceToRepair.getUsername(),
+      };
+    });
+
     session.setHandler("set_connection_info", async (data) => {
       address = data.address;
       username = data.username;
       password = data.password;
+      if (password == "") {
+        password = deviceToRepair.getPassword();
+      }
       await session.nextView();
       return true;
     });
