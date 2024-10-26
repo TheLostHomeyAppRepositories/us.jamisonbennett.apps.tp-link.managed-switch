@@ -1,0 +1,9 @@
+{
+  "0.1.0": {
+    "en": [
+      "Initial release of the TP-Link Managed Switch app.",
+      "Provides basic control and monitoring for TP-Link managed switches.",
+      "Supports discovery of devices on the network and integration with Homey."
+    ]
+  }
+}
