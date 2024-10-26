@@ -24,3 +24,10 @@ tests/
 .git/
 .gitignore
 .gitattributes
+
+# Build and configuration files
+.env
+..eslintrc.json
+package-lock.json
+tsconfig.json
+
