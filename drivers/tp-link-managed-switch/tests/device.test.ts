@@ -21,6 +21,8 @@ jest.mock('homey', () => {
       setCapabilityOptions = jest.fn();
       setStoreValue = jest.fn();
       setEnergy = jest.fn();
+      setAvailable = jest.fn();
+      setUnavailable = jest.fn();
     },
   };
 });
@@ -67,11 +69,11 @@ describe('Device Class Tests', () => {
 
       await device.onInit();
 
-      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.1', { title: 'mockValue' });
-      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.2', { title: 'mockValue' });
-      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.3', { title: 'mockValue' });
-      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.4', { title: 'mockValue' });
-      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.5', { title: 'mockValue' });
+      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.1', { title: 'mockValue', uiQuickAction: false });
+      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.2', { title: 'mockValue', uiQuickAction: false });
+      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.3', { title: 'mockValue', uiQuickAction: false });
+      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.4', { title: 'mockValue', uiQuickAction: false });
+      expect(setCapabilityOptionsSpy).toHaveBeenCalledWith('onoff.5', { title: 'mockValue', uiQuickAction: false });
     });
 
     it('should set energy', async () => {
@@ -214,7 +216,7 @@ describe('Device Class Tests', () => {
     expect(setStoreValueSpy).toHaveBeenCalledWith('password', 'newPassword');
   });
 
-  it('should not update credentials on repait that fails to connect', async () => {
+  it('should update credentials on repair ievent if connect fails', async () => {
     const setStoreValueSpy = jest.spyOn(device, 'setStoreValue');
 
     await device.onInit();
@@ -222,7 +224,9 @@ describe('Device Class Tests', () => {
     await expect(device.repair('newAddress', 'newUsername', 'newPassword')).rejects.toThrow();
    
     expect(connectSpy).toHaveBeenCalledTimes(2);
-    expect(setStoreValueSpy).not.toHaveBeenCalled();
+    expect(setStoreValueSpy).toHaveBeenCalledWith('address', 'newAddress');
+    expect(setStoreValueSpy).toHaveBeenCalledWith('username', 'newUsername');
+    expect(setStoreValueSpy).toHaveBeenCalledWith('password', 'newPassword');
   });
 
   it('should update credentials on save', async () => {
