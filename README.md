@@ -56,7 +56,12 @@ We welcome contributions to enhance this app! Please submit issues or pull reque
 
 ### Prepare the Environment
 
-Install the necessary dependencies: `npm install`
+Install the necessary dependencies: `npm install`<br />
+Create the app.json:
+```
+cp .homeycompose/app.json .
+npx homey app build
+```
 
 ### Run Unit Tests
 
