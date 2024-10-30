@@ -15,12 +15,6 @@ class Driver extends Homey.Driver {
       return args.device.isLinkUp(args.port, true);
     });
 
-    const linkDownCondition = this.homey.flow.getConditionCard('link_down');
-    linkDownCondition.registerRunListener(async (args: any, state: any) => {
-      this.validatePortCardArgs(args);
-      return args.device.isLinkUp(args.port, true).then((result: boolean) => !result);
-    });
-
     const enablePortAction = this.homey.flow.getActionCard('enable_port');
     enablePortAction.registerRunListener(async (args: any, state: any) => {
       this.validatePortCardArgs(args);

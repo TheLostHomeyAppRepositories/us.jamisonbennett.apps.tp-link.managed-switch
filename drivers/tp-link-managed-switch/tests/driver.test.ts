@@ -45,7 +45,6 @@ describe('Driver', () => {
       await driver.onInit();
 
       expect(mockFlow.getConditionCard).toHaveBeenCalledWith('link_up');
-      expect(mockFlow.getConditionCard).toHaveBeenCalledWith('link_down');
       expect(mockFlow.getActionCard).toHaveBeenCalledWith('enable_port');
       expect(mockFlow.getActionCard).toHaveBeenCalledWith('disable_port');
       expect(mockFlow.getActionCard).toHaveBeenCalledWith('enable_leds');

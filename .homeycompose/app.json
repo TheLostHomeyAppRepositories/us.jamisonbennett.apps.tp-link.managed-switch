@@ -1,6 +1,6 @@
 {
-  "id": "us.jamisonbennett.apps.homey.tp-link.managed-switch",
-  "version": "0.1.0",
+  "id": "us.jamisonbennett.apps.tp-link.managed-switch",
+  "version": "0.1.1",
   "compatibility": ">=12.0.0",
   "sdk": 3,
   "platforms": [
@@ -10,7 +10,7 @@
     "en": "TP-Link Managed Switch"
   },
   "description": {
-    "en": "Switch management that supports TP-Link managed switches"
+    "en": "Streamline your network with smart automation"
   },
   "category": [
     "internet"
