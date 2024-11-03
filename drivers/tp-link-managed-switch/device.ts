@@ -5,6 +5,10 @@ import DeviceAPI from './deviceAPI';
 
 class Device extends Homey.Device {
 
+  private linkStateChanged: Homey.FlowCardTriggerDevice | null = null;
+  private suspendRefreshTime = 300000; // Suspend refreshing for 5 minutes to prepare for a repair
+  private refreshPromise: Promise<void> | null = null;
+  private lastSuspendRefreshTime = 0;
   private needsFullRefresh = false;
   private registeredCapabilities = new Set();
   private address: string = ""
@@ -12,11 +16,13 @@ class Device extends Homey.Device {
   private password: string = ""
   private deviceAPI: DeviceAPI | null = null
   private refreshInterval: NodeJS.Timeout | null = null
+  private refreshIntervalProcessing: boolean = false
   private refreshTimeIterval = 60000; // 1 minute
   private refreshAndLoginTimeIterval = 3600000; // 1 Hour, this will cause other users to be logged out of the managed switch so don't make it too frequent
   private lastRefreshLoginTime = 0;
+  private lastAllLinksStatus: boolean[] | null = null;
 
-  private configurablePorts: boolean[] | null = null
+  private configurablePorts: boolean[] | null = null;
 
   async onInit() {
     this.log('TP-Link managed switch device has been initialized');
@@ -24,66 +30,88 @@ class Device extends Homey.Device {
     this.registerCapabilityListener("onoff.favorite", this.onCapabilityOnoffFavorite.bind(this));
     this.registerCapabilityListener("onoff.leds", this.onCapabilityOnoffLeds.bind(this));
 
-    this.refreshInterval = setInterval(async () => {
-      if (this.needsFullRefresh) {
-        this.fullRefresh().catch(async (error) => {
-          this.log('Error performing full refresh: ', error);
-          await this.setUnavailable(error);
-        });
-      } else {
-        const isLoggedIn = this.deviceAPI != null && (await this.deviceAPI.isLoggedIn());
-        const forceRefresh = Date.now() - this.lastRefreshLoginTime >= this.refreshAndLoginTimeIterval;
-        if (forceRefresh) {
-          this.lastRefreshLoginTime = Date.now();
-        }
-        if (isLoggedIn || forceRefresh) {
-          this.refreshState().catch(error => {
-            this.log('Error refreshing state: ', error);
-          });
-        }
-      }
-    }, this.refreshTimeIterval);
+    this.linkStateChanged = this.homey.flow.getDeviceTriggerCard('link_state_changed');
 
     return this.fullRefresh().catch(async (error) => {
       this.log('Error performing init: ', error);
       await this.setUnavailable(error);
+    }).finally( () => {
+      this.refreshInterval = setInterval(async () => {
+        if (this.getRefreshIntervalProcessing()) {
+          return;
+        }
+        if (Date.now() - this.suspendRefreshTime < this.lastSuspendRefreshTime) {
+          return;
+        }
+        try {
+          this.setRefreshIntervalProcessing(true);
+          if (this.needsFullRefresh) {
+            this.fullRefresh().catch(async (error) => {
+              this.log('Error performing full refresh: ', error);
+              await this.setUnavailable(error);
+            });
+          } else {
+            const isLoggedIn = this.deviceAPI != null && (await this.deviceAPI.isLoggedIn());
+            const forceRefresh = Date.now() - this.lastRefreshLoginTime >= this.refreshAndLoginTimeIterval;
+            if (forceRefresh) {
+              this.lastRefreshLoginTime = Date.now();
+            }
+            if (isLoggedIn || forceRefresh) {
+              this.refreshState().catch(error => {
+                this.log('Error refreshing state: ', error);
+              });
+            }
+          }
+        } finally {
+          this.setRefreshIntervalProcessing(false);
+        }
+      }, this.refreshTimeIterval);
     });
   }
 
   async fullRefresh() {
     this.needsFullRefresh = true;
 
-    this.address = this.getStoreValue('address');
-    this.username = this.getStoreValue('username');
-    this.password = this.getStoreValue('password');
-    this.deviceAPI = new DeviceAPI(this, this.address, this.username, this.password);
-    this.lastRefreshLoginTime = Date.now();
-    if (!await this.deviceAPI.connect()) {
-      throw new Error("Unable to connect to managed switch");
-    } 
+    this.refreshPromise = new Promise<void>(async (resolve, reject) => {
+      try {
+        this.address = this.getStoreValue('address');
+        this.username = this.getStoreValue('username');
+        this.password = this.getStoreValue('password');
+        this.deviceAPI = new DeviceAPI(this, this.address, this.username, this.password);
+        this.lastRefreshLoginTime = Date.now();
+        if (!await this.deviceAPI.connect()) {
+          throw new Error("Unable to connect to managed switch");
+        } 
 
-    // Await for each one in order so they are properly ordered
-    for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
-      await this.addCapabilityIfNeeded(i);
-    }
+        // Await for each one in order so they are properly ordered
+        for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
+          await this.addCapabilityIfNeeded(i);
+        }
 
-    await this.waitForInitialCapabilityRegistrationToFinish();
+        await this.waitForInitialCapabilityRegistrationToFinish();
 
-    const promises = [];
-    for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
-      promises.push(this.setupCapability(i));
-    }
+        const promises = [];
+        for (let i = 1; i <= this.deviceAPI.getNumPorts(); i++ ) {
+          promises.push(this.setupCapability(i));
+        }
 
-    promises.push(this.setEnergy(this.energyUsage()));
+        promises.push(this.setEnergy(this.energyUsage()));
 
-    this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
+        this.handleConfigurablePortsChange(this.getSetting('configurable_ports'));
 
-    return Promise.all(promises).then(async () => {
-      await this.setAvailable();
-      this.needsFullRefresh = false;
-      // Set the current values of each switch
-      return this.refreshState();
+        await Promise.all(promises).then(async () => {
+          await this.setAvailable();
+          this.needsFullRefresh = false;
+          // Set the current values of each switch
+          return this.refreshState();
+        });
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error(String(error)));
+      } finally {
+        resolve();
+      }
     });
+    return this.refreshPromise;
   }
 
   async onUninit() {
@@ -178,6 +206,19 @@ class Device extends Homey.Device {
     const ledStatus = await this.deviceAPI.getLedsEnabled();
     if (ledStatus != null) {
       promises.push(this.setCapabilityIfNeeded(`onoff.leds`, ledStatus));
+    }
+
+    // Handle link up/down triggers
+    const allLinksStatus = await this.deviceAPI.getAllLinksUp();
+    if (allLinksStatus && this.lastAllLinksStatus && allLinksStatus.length == this.lastAllLinksStatus.length) {
+      for (let port = 0; port < allLinksStatus.length; port++) {
+        if (allLinksStatus[port] != this.lastAllLinksStatus[port]) {
+          this.linkStateChanged?.trigger(this, {port: port+1, linkUp: allLinksStatus[port]}, {});
+        }
+      }
+    }
+    if (allLinksStatus) {
+      this.lastAllLinksStatus = allLinksStatus;
     }
 
     return Promise.all(promises).then(() => undefined);
@@ -376,7 +417,10 @@ class Device extends Homey.Device {
     this.password = password;
 
     await this.save();
-    return this.fullRefresh();
+    await this.suspendRefresh();
+    return this.fullRefresh().finally(() => {
+      this.resumeRefresh();
+    });
   }
 
   public async save() {
@@ -397,6 +441,26 @@ class Device extends Homey.Device {
 
   public getPassword() {
     return this.getStoreValue('password');
+  }
+
+  public async suspendRefresh() {
+    if (this.refreshPromise) {
+      await this.refreshPromise; // Wait for the ongoing refresh to finish
+    }
+    this.lastSuspendRefreshTime = Date.now();
+  }
+
+  public async resumeRefresh() {
+    this.lastSuspendRefreshTime = 0;
+  }
+
+  private setRefreshIntervalProcessing(value: boolean) {
+    this.refreshIntervalProcessing = value;
+  }
+
+  private getRefreshIntervalProcessing() {
+    const refreshIntervalProcessing = this.refreshIntervalProcessing;
+    return refreshIntervalProcessing;
   }
 }
 

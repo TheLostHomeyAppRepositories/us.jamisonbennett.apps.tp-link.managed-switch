@@ -1,4 +1,28 @@
 {
+  "triggers": [
+    {
+      "id": "link_state_changed",
+      "title": {
+        "en": "Switch port state changed"
+      },
+      "titleFormatted": {
+        "en": "Switch port link changed states"
+      },
+      "tokens": [
+        {
+          "name": "port",
+          "type": "number",
+          "title": { "en": "port" },
+          "example": 5
+        },
+        {
+          "name": "linkUp",
+          "type": "boolean",
+          "title": { "en": "Link is up (true) or down (false)" }
+        }
+      ]
+    }
+  ],
   "conditions": [
     {
       "id": "link_up",

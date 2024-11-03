@@ -341,6 +341,38 @@ describe('DeviceAPI', () => {
       
   }); 
 
+  describe('getAllLinksUp', () => {
+    it('should return all the link status', async () => {
+      await performSuccessfulLogin(deviceAPI);
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        status: 200,
+        data: mockSystemInfoData
+      });;
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        status: 200,
+        data: mockPortSettingsData
+      });
+
+      const result = await deviceAPI.getAllLinksUp();
+      expect(result).toEqual([true, true, false, true, true, false, true, false]);
+    });
+
+    it('should return null if getPortSettings fails', async () => {
+      await performSuccessfulLogin(deviceAPI); 
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        status: 200,
+        data: mockSystemInfoData
+      });;
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        status: 400
+      });
+      
+      const result = await deviceAPI.getAllLinksUp();
+      expect(result).toBeNull();
+    });
+      
+  });
+
   describe('restart', () => {
     it('should return true if it succeeds', async () => {
       await performSuccessfulLogin(deviceAPI);

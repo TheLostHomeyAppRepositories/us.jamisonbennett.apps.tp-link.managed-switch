@@ -53,11 +53,34 @@ class DeviceAPI extends Logger {
   }
 
   public async isLoggedIn(): Promise<boolean> {
-    const systemInfo = await this.getSystemInfo();
-    if (systemInfo) {
-      return true;
+    const cookie = this.getCookie();
+    if (!cookie || cookie == "") {
+      return false;
     }
-    return false;
+
+    try {
+      const response = await axios.get(`http://${this.ipAddress}/SystemInfoRpm.htm`, {
+        headers: {
+          'Cookie': cookie
+        }
+      });
+
+      if (response.status !== 200) {
+        return false;
+      }
+
+      const data = await response.data;
+
+      const macAddressMatch = data.match(/macStr:\s?\[\n?\s*"([^"]+)"\n?\s*\]/);
+
+      if (!macAddressMatch || !macAddressMatch[1]) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   private async reloginIfNeeded(): Promise<boolean> {
@@ -112,8 +135,7 @@ class DeviceAPI extends Logger {
 
       this.saveSessionCookie(setCookieHeader);
 
-      this.systemInfo = await this.getSystemInfo();
-      return this.systemInfo != null;
+      return this.isLoggedIn();
     } catch (error) {
       this.log(`Error connecting to the device: ${error instanceof Error ? error.message : 'an unknown error occurred.'}`);
       return false;
@@ -133,15 +155,12 @@ class DeviceAPI extends Logger {
   private async getSystemInfo(): Promise<SystemInfo | null> {
     // Gets the information from the device's system info page.
     // This requires an active login session.
-    if (!this.cookie) {
-      this.log('Error: No valid session cookie found. Please connect first.');
-      return null;
-    }
+    const cookie = this.getCookie();
 
     try {
       const response = await axios.get(`http://${this.ipAddress}/SystemInfoRpm.htm`, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         }
       });
 
@@ -188,15 +207,12 @@ class DeviceAPI extends Logger {
 
   private async getPortSettings(): Promise<PortSettings | null> {
     // Gets the device's port settings
-    if (!this.cookie) {
-      this.log('Error: No valid session cookie found. Please connect first.');
-      return null;
-    }
+    const cookie = this.getCookie();
 
     try {
       const response = await axios.get(`http://${this.ipAddress}/PortSettingRpm.htm`, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         }
       });
 
@@ -319,9 +335,10 @@ class DeviceAPI extends Logger {
       }
 
       // NOTE: The device uses HTTP GET for changing the configuration.
+      const cookie = this.getCookie();
       const response = await axios.get(`http://${this.ipAddress}/port_setting.cgi`, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         },
         params: {
           portid: port,
@@ -360,15 +377,12 @@ class DeviceAPI extends Logger {
 
   private async getLedSettings(): Promise<boolean | null> {
     // Gets the device's port settings
-    if (!this.cookie) {
-      this.log('Error: No valid session cookie found. Please connect first.');
-      return null;
-    }
+    const cookie = this.getCookie();
 
     try {
       const response = await axios.get(`http://${this.ipAddress}/TurnOnLEDRpm.htm`, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         }
       });
 
@@ -404,9 +418,10 @@ class DeviceAPI extends Logger {
     
     try {
       // NOTE: The device uses HTTP GET for changing the configuration.
+      const cookie = this.getCookie();
       const response = await axios.get(`http://${this.ipAddress}/led_on_set.cgi`, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         },
         params: {
           rd_led: state,
@@ -434,9 +449,10 @@ class DeviceAPI extends Logger {
     }
   
     try {
+      const cookie = this.getCookie();
       const response = await axios.post(`http://${this.ipAddress}/reboot.cgi`, null, {
         headers: {
-          'Cookie': this.cookie
+          'Cookie': cookie
         }
       });
       
@@ -466,6 +482,25 @@ class DeviceAPI extends Logger {
       return null;
     } 
     return portSettings.linkUp[port - 1];
+  }
+
+  public async getAllLinksUp(): Promise<boolean[] | null> {
+    // Query the device for the current link up status.
+    // This logs in if needed.
+    const loggedIn = await this.reloginIfNeeded();
+    if (!loggedIn) {
+      return null;
+    }
+    const portSettings = await this.getPortSettings();
+    if (!portSettings) {
+      return null;
+    }
+    return portSettings.linkUp;
+  }
+
+  private getCookie(): string {
+    const cookie = this.cookie;
+    return cookie;
   }
 
 }
