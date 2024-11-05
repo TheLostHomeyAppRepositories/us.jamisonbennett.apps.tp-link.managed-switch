@@ -11,6 +11,8 @@ The **TP-Link Managed Switch** app integrates TP-Link managed switches with your
 - **Device Integration**: Seamlessly integrate with multiple TP-Link managed switch models.
 - **Automation**: Create Homey flows to automate network management tasks based on your preferences or specific conditions.
 - **Status Monitoring**: View the status of each port (enabled/disabled) within the Homey app.
+- **Detection of Link Changes**: Switch ports are monitored for link status every minute.
+
 
 ## Supported Devices
 - TP-Link TL-SG105E
@@ -18,6 +20,8 @@ The **TP-Link Managed Switch** app integrates TP-Link managed switches with your
 - TP-Link TL-SG116E
 - TP-Link TL-SG1024E
 - Additional TP-Link easy smart switch devices
+
+Support may require the Easy Smart Switch hardware versions and latest firmware.
 
 ## Installation
 1. **Install the App**: Search for "TP-Link Managed Switch" in the Homey app store and install it.

@@ -4,5 +4,8 @@
   },
   "0.1.1": {
     "en": "Corrected certification issues."
+  },
+  "0.1.2": {
+    "en": "Added monitoring of the switch port link changes. The ports link status is checked once per minute so it may not detect rapid network topology changes."
   }
 }
