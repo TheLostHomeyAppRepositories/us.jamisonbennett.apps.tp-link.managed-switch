@@ -26,7 +26,10 @@
           },
           "connection_error": {
             "title": "Connection error",
-            "errorText": "Unabled to connect to the managed switch",
+            "errorText": "Unabled to connect to the managed switch. Ensure the hardware version and firmware version are supported.",
+            "supportedHardware": "Supported Hardware",
+            "hardwareVersion": "Hardware Version",
+            "firmwareVersion": "Firmware Version",
             "close": "Close"
           }
         },

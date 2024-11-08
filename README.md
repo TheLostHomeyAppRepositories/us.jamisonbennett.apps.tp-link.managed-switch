@@ -15,11 +15,60 @@ The **TP-Link Managed Switch** app integrates TP-Link managed switches with your
 
 
 ## Supported Devices
-- TP-Link TL-SG105E
-- TP-Link TL-SG108E
-- TP-Link TL-SG116E
-- TP-Link TL-SG1024E
-- Additional TP-Link easy smart switch devices
+- TP-Link TL-SG105E (HW v5 & v5.6)
+- TP-Link TL-SG108E (HW v6 & v6.6)
+- TP-Link TL-SG116E (HW v2.20 & v2.26)
+- TP-Link TL-SG1024E (HW v4.20, v6, v6.6, v7, & v7.60)
+- Additional TP-Link Easy Smart Switch hardware with firmware v1.0.0 build 20230214 or later
+
+**TL-SG105E**
+
+| TL-SG105E Hardware Version | Supported Firmware Version |
+| -------------------------- | -------- |
+| TL-SG105E v1 | Unsupported |
+| TL-SG105E v2 | Unsupported |
+| TL-SG105E v3 | Unsupported |
+| TL-SG105E v4 | Unsupported |
+| TL-SG105E v5 | 1.0.0 Build 20230214 |
+| TL-SG105E v5.6 | 1.0.0 Build 20230214 |
+
+**TL-SG108E**
+
+| TL-SG108E Hardware Version | Supported Firmware Version |
+| -------------------------- | -------- |
+| TL-SG108E v1 | Unsupported |
+| TL-SG108E v2 | Unsupported |
+| TL-SG108E v3 | Unsupported |
+| TL-SG108E v4 | Unsupported |
+| TL-SG108E v5 | Unsupported |
+| TL-SG108E v6 | 1.0.0 Build 20230218 |
+| TL-SG108E v6.6 | 1.0.0 Build 20230218 |
+
+**TL-SG116E**
+
+| TL-SG116E Hardware Version | Supported Firmware Version |
+| -------------------------- | -------- |
+| TL-SG116E v1 | Unsupported |
+| TL-SG116E v1.20 | Unsupported |
+| TL-SG116E v2 | Unsupported |
+| TL-SG116E v2.6 | Unsupported |
+| TL-SG116E v2.20 | 1.0.0 Build 20230220 |
+| TL-SG116E v2.26 | 1.0.0 Build 20230220 |
+
+**TL-SG1024DE**
+
+| TL-SG1024DE Hardware Version | Supported Firmware Version |
+| -------------------------- | -------- |
+| TL-SG1024DE v1 | Unsupported |
+| TL-SG1024DE v2 | Unsupported |
+| TL-SG1024DE v3 | Unsupported |
+| TL-SG1024DE v4 | Unsupported |
+| TL-SG1024DE v4.20 | 1.0.0 Build 20230219 |
+| TL-SG1024DE v4.26 | Unsupported |
+| TL-SG1024DE v6 | 1.0.0 Build 20230220 |
+| TL-SG1024DE v6.6 | 1.0.0 Build 20230220 |
+| TL-SG1024DE v7 | 1.0.0 Build 20230616 |
+| TL-SG1024DE v7.60 | 1.0.0 Build 20230616 |
 
 Support may require the Easy Smart Switch hardware versions and latest firmware.
 

@@ -8,13 +8,11 @@ Features:
 - Detection of Link Changes: Switch ports are monitored for link status every minute.
 
 Supported Devices:
-- TP-Link TL-SG105E
-- TP-Link TL-SG108E
-- TP-Link TL-SG116E
-- TP-Link TL-SG1024E
-- Additional TP-Link easy smart switch devices
-
-Support may require the Easy Smart Switch hardware versions and latest firmware.
+- TP-Link TL-SG105E (HW v5 & v5.6)
+- TP-Link TL-SG108E (HW v6 & v6.6)
+- TP-Link TL-SG116E (HW v2.20 & v2.26)
+- TP-Link TL-SG1024E (HW v4.20, v6, v6.6, v7, & v7.60)
+- Additional TP-Link Easy Smart Switch hardware with firmware v1.0.0 build 20230214 or later
 
 Disclaimer:
 This app is an independent third-party application and is not affiliated with, endorsed by, or sponsored by TP-Link Technologies Co., Ltd. TP-Link is a registered trademark of TP-Link Technologies Co., Ltd. All product names, logos, and brands are property of their respective owners. The use of these names, logos, and brands does not imply any affiliation with or endorsement by them.
