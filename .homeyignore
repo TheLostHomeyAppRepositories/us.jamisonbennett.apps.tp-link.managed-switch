@@ -27,7 +27,7 @@ tests/
 
 # Build and configuration files
 .env
-..eslintrc.json
+.eslintrc.json
 package-lock.json
 tsconfig.json
 
