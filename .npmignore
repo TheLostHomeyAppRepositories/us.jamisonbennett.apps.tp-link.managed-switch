@@ -8,3 +8,13 @@ jest.config.ts
 **/tests/
 **/__tests__/
 **/__mocks__/
+
+.env
+
+# OS metadata
+.DS_Store
+**/.DS_Store
+._*
+**/._*
+Thumbs.db
+desktop.ini
