@@ -118,5 +118,20 @@
     "ru": "Добавьте поддержку более старых версий прошивки и оборудования TP-Link, а также переводы для интернационализации.",
     "ko": "TP-Link의 이전 펌웨어 및 하드웨어 버전에 대한 지원을 추가하고 국제화를 위한 번역을 추가하세요.",
     "ar": "إضافة دعم للإصدارات الأقدم من البرامج الثابتة والأجهزة لـ TP-Link وإضافة ترجمات للتدويل."
+  },
+  "0.1.8": {
+    "en": "Security enhancements.",
+    "nl": "Beveiligingsverbeteringen.",
+    "da": "Sikkerhedsforbedringer.",
+    "de": "Sicherheitsverbesserungen.",
+    "es": "Mejoras de seguridad.",
+    "fr": "Améliorations de sécurité.",
+    "it": "Miglioramenti alla sicurezza.",
+    "no": "Sikkerhetsforbedringer.",
+    "sv": "Säkerhetsförbättringar.",
+    "pl": "Ulepszenia zabezpieczeń.",
+    "ru": "Улучшения безопасности.",
+    "ko": "보안 강화.",
+    "ar": "تحسينات الأمان."
   }
 }
