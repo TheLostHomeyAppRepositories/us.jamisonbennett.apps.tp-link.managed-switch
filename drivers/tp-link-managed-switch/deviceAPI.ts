@@ -172,7 +172,7 @@ class DeviceAPI extends Logger {
       }
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
