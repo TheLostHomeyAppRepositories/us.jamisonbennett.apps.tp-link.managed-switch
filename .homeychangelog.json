@@ -133,5 +133,20 @@
     "ru": "Улучшения безопасности.",
     "ko": "보안 강화.",
     "ar": "تحسينات الأمان."
+  },
+  "0.1.9": {
+    "en": "Fix CVEs",
+    "nl": "Los CVE's op",
+    "da": "Ret fejl i CVE'er",
+    "de": "Behebe CVEs",
+    "es": "Corregir CVEs",
+    "fr": "Corriger les CVE",
+    "it": "Correggi CVE",
+    "no": "Fiks CVE-er",
+    "sv": "Åtgärda CVE:er",
+    "pl": "Napraw CVE",
+    "ru": "Исправить CVE",
+    "ko": "CVE 수정하기",
+    "ar": "إصلاح CVEs"
   }
 }
